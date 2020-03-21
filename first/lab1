@@ -1,0 +1,19 @@
+#!/bin/bash
+
+file_info () {
+    IFS=$'\n'
+    
+    for unit in $(ls $1) 
+    do
+	if [ -d "$unit" ]; then
+	file_info "$unit"
+	else
+            time="$(ffmpeg -i $1"/"$unit 2>&1 | grep Duration | awk '{print $2}' | tr -d ,)"
+            full=${unit%.*}","${unit##*"${unit%.*}"}","$(stat -c '%s, %z' $1"/""$unit")","$time
+            echo $full >> lab1.csv
+	fi
+    done
+}
+
+echo "name, format, size(b), date, time" > lab1.csv
+file_info "$(pwd)"
