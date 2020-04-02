@@ -1,6 +1,10 @@
 #!/bin/bash
 
 #For build project install package "GO"
+wget https://dl.google.com/go/go1.14.1.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.14.1.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
+
 #git is standart package in the most versions of linux
 git clone https://github.com/yggdrasil-network/yggdrasil-go
 
