@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#For build project install package "GO"
+#git is standart package in the most versions of linux
+git clone https://github.com/yggdrasil-network/yggdrasil-go
+
+cd yggdrasil-go 
+./build

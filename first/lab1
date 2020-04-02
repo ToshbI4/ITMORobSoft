@@ -29,7 +29,10 @@ file_info () {
 		time=""
 	    fi 		
             # Собираем все данные для файла в одну строку
-	    full=${unit%.*}","${unit##*"${unit%.*}"}","$(stat -c '%s, %z' $1"/""$unit")","$time
+	    mb=1024 
+	    size1=$(( $(stat -c %s $1"/""$unit")/1024 ))
+	    size2=$(( $(stat -c %s $1"/""$unit")%1024 ))
+	    full=${unit%.*}","${unit##*"${unit%.*}"}",$size1"."$size2,"$(stat -c %z $1"/""$unit")","$time
 	    # Записываем эту строку в файл
             echo $full >> lab1.csv
 	fi
