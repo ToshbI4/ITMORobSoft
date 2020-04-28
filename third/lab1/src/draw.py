@@ -9,87 +9,93 @@ PI = 3.1415926535897
 
 
 def rotate(speed, angle, clockwise):
-    # Starts a new node
+    """ Функция поворота черепахи вокруг своей оси"""
+
+    # Инициализируем новый нод
     rospy.init_node('AntonCode', anonymous=True)
+    """ Объявляем, что наш нод является издателем (publisher), т.е. он будет отправлять данные для поворота черепахи"""
     velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
     vel_msg = Twist()
 
-    # Receiving the user's input
     print("Let's rotate the Turtle")
 
-    # Converting from angles to radians
+    # Переводим градусы в радианы
     angular_speed = speed * 2 * PI / 360
     relative_angle = angle * 2 * PI / 360
 
-    # We wont use linear components
+    # только поворачиваемся вдоль оси z, поэтому зануляем ненужные компоненты
     vel_msg.linear.x = 0
     vel_msg.linear.y = 0
     vel_msg.linear.z = 0
     vel_msg.angular.x = 0
     vel_msg.angular.y = 0
 
-    # Checking if our movement is CW or CCW
+    # Для различных направлений вращения
     if clockwise:
         vel_msg.angular.z = -abs(angular_speed)
     else:
         vel_msg.angular.z = abs(angular_speed)
-    # Setting the current time for distance calculus
+
+    # Устанавливаем текущее время для вычисления угла поворота
     t0 = rospy.Time.now().to_sec()
     current_angle = 0
-
+    
+    # Поворачиваем, пока не достигнем нужного угла поворота
     while current_angle < relative_angle:
         velocity_publisher.publish(vel_msg)
         t1 = rospy.Time.now().to_sec()
         current_angle = angular_speed*(t1-t0)
 
-    # Forcing our robot to stop
+    # Принудительно останавливаем черепаху
     vel_msg.angular.z = 0
     velocity_publisher.publish(vel_msg)
 
 
 def move(speed, distance, is_forward):
-    # Starts a new node
+    """Функция движения черепахи вдоль прямой линии"""
+
+    # Инициализируем новый нод
     rospy.init_node('AntonCode', anonymous=True)
+    """ Объявляем, что наш нод является издателем (publisher), т.е. он будет отправлять данные для поворота черепахи"""
     velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
     vel_msg = Twist()
 
-    # Receiveing the user's input
     print("Let's move your robot")
 
-    # Checking if the movement is forward or backwards
+    # Устанавливаем заданное направление движения черепахи
     if is_forward:
         vel_msg.linear.x = abs(speed)
     else:
         vel_msg.linear.x = -abs(speed)
-    # Since we are moving just in x-axis
+
+    # Двигаемся по прямой, поэтому остальные координаты зануляем
     vel_msg.linear.y = 0
     vel_msg.linear.z = 0
     vel_msg.angular.x = 0
     vel_msg.angular.y = 0
     vel_msg.angular.z = 0
 
-    # Setting the current time for distance calculus
+    # Устанавливаем текущее время для вычисления дистанции
     t0 = rospy.Time.now().to_sec()
     current_distance = 0
 
-    # Loop to move the turtle in an specified distance
+    # Черепаха движется, пока не пройдет заданное расстояние
     while current_distance < distance:
-        # Publish the velocity
+        """ Отправляем скорость, с которой должна двигаться черепаха, если она еще не прошла заданный    путь"""
         velocity_publisher.publish(vel_msg)
-        # Takes actual time to velocity calculus
+        # Вычисляем время
         t1 = rospy.Time.now().to_sec()
-        # Calculates distancePoseStamped
+        # Вычисляем пройденную дистанцию
         current_distance = speed*(t1-t0)
-    # After the loop, stops the robot
+    # Останавливаем черепаху
     vel_msg.linear.x = 0
-    # Force the robot to stop
     velocity_publisher.publish(vel_msg)
 
 
 def transition():
+    """ Функция перехода черепахи между различными цифрами"""
 
     pen(1, 2)
-    # transition
     rotate(50, 90, 1)
     move(1, 1, 1)
     rotate(50, 90, 0)
@@ -100,8 +106,8 @@ def transition():
 
 
 def two():
-
     # Two
+
     move(2, 1, 1)
     rotate(90, 90, 1)
     move(2, 1, 1)
@@ -114,8 +120,8 @@ def two():
 
 
 def four():
-
     # Four
+
     rotate(100, 180, 1)
     move(2, 1, 1)
     rotate(90, 90, 0)
@@ -127,8 +133,8 @@ def four():
 
 
 def three():
-
     # Three
+
     rotate(90, 90, 1)
     move(1, 1, 1)
     rotate(100, 135, 1)
@@ -145,8 +151,8 @@ def three():
 
 
 def nine():
-
     # Nine
+
     rotate(90, 90, 1)
     move(1, 1, 1)
     rotate(90, 90, 1)
@@ -166,8 +172,8 @@ def nine():
 
 
 def zero():
-
     # Zero
+
     rotate(90, 90, 1)
     move(2, 1, 1)
     rotate(90, 90, 1)
@@ -182,6 +188,7 @@ def zero():
 
 
 def pen(status, width):
+    """ Используем сервис установки цвета ручки."""
     rospy.init_node('AntonCode', anonymous=True)
     rospy.wait_for_service('turtle1/set_pen')
     set_pen = rospy.ServiceProxy('turtle1/set_pen', SetPen)
@@ -189,6 +196,8 @@ def pen(status, width):
 
 
 def clear():
+    """ Используем сервис для очистки окна с черепахой заданным цветом. 
+    Это нужно, чтобы в любой ситуации ручка не сливалась с экраном и черепаха перемещалась по заданному цвету."""
     rospy.init_node('AntonCode', anonymous=True)
     rospy.wait_for_service('clear')
     fill_bg = rospy.ServiceProxy('clear', Empty)
@@ -200,9 +209,9 @@ def clear():
 
 if __name__ == '__main__':
     try:
-
+	# Устанавливаем цвет фона
         clear()
-        # Start position
+        # Черепаха перемещается из центра окна в стартовую позицию
         pen(1, 2)
         move(5, 6.5, 0)
         pen(0, 2)
