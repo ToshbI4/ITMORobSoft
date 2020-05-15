@@ -10,6 +10,7 @@ Labs for robot software lessons
 
 **3. Third Lab.** ROS Turtlesim
 ------------------------------------
+**Path to script: ITMORobSoft/third/lab1/src/draw.py
 
 ![243909](http://i.yapx.ru/HJfyM.png)
 ![Terminal](http://i.yapx.ru/HJf3O.png)
